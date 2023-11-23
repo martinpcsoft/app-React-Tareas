@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import Form from "./componentes/Form";
+import Header from "./componentes/Header";
+import ListaTareas from "./componentes/TaskList";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tareas, setTareas] = useState([]);
+  const [tarea, setTarea] = useState({});
+
+  useEffect(() => {
+    const obtenerTareasLocalStorage = () => {
+      const tareasLocalStorage = JSON.parse(localStorage.getItem("tareas")) ?? [];
+
+      setTareas(tareasLocalStorage);
+    };
+
+    obtenerTareasLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tareas", JSON.stringify(tareas));
+  }, [tareas]);
+
+  const EliminarTarea = (id) => {
+    const actualizarTarea = tareas.filter((tarea) => tarea.id !== id);
+    setTareas(actualizarTarea);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="contanier mx-auto  mt-20">
+      <Header />
+      <div className="mt-12 justify-center md:flex">
+        <Form
+          tarea={tarea}
+          tareas={tareas}
+          setTareas={setTareas}
+          setTarea={setTarea}
+        />
+        <ListaTareas
+          tareas={tareas}
+          setTarea={setTarea}
+          EliminarTarea={EliminarTarea}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
